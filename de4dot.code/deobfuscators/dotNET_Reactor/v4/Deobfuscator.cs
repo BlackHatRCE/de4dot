@@ -453,23 +453,25 @@ namespace de4dot.code.deobfuscators.dotNET_Reactor.v4 {
 				FreePEImage();
 			booleanDecrypter.Initialize(fileData, DeobfuscatedFile);
 			booleanValueInliner = new BooleanValueInliner();
+			booleanValueInliner.UseUnknownArgs = true;
+			staticStringInliner.UseUnknownArgs = true;
 			emptyClass = new EmptyClass(module);
 
 			if (options.DecryptBools) {
 				booleanValueInliner.Add(booleanDecrypter.Method, (method, gim, args) => {
-					return booleanDecrypter.Decrypt((int)args[0]);
+					return args[0] == null ? null : booleanDecrypter.Decrypt((int)args[0]);
 				});
 			}
 
 			if (decryptStrings) {
 				foreach (var info in stringDecrypter.DecrypterInfos) {
 					staticStringInliner.Add(info.method, (method2, gim, args) => {
-						return stringDecrypter.Decrypt(method2, (int)args[0]);
+						return args[0] == null ? null : stringDecrypter.Decrypt(method2, (int)args[0]);
 					});
 				}
 				if (stringDecrypter.OtherStringDecrypter != null) {
 					staticStringInliner.Add(stringDecrypter.OtherStringDecrypter, (method2, gim, args) => {
-						return stringDecrypter.Decrypt((string)args[0]);
+						return args[0] == null ? null : stringDecrypter.Decrypt((string)args[0]);
 					});
 				}
 			}
